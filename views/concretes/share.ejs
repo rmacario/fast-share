@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <link rel="stylesheet" href="../styles/style.css" />
+    <title>Fast-Share</title>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+
+
+<body>
+
+    <div id="content" contenteditable="true" class="border-none content" tabindex="0">
+    </div>
+
+    <script>
+        function joinRoom(socket) {
+            socket.emit('onAccess', window.location.pathname);
+        }
+
+        function debounce(func, wait, immediate) {
+            var timeout;
+
+            return function () {
+                var context = this,
+                    args = arguments;
+
+                var callNow = immediate && !timeout;
+
+                clearTimeout(timeout);
+                timeout = setTimeout(function () {
+                    timeout = null;
+                    if (!immediate) {
+                        func.apply(context, args);
+                    }
+                }, wait);
+                if (callNow) func.apply(context, args);
+            };
+        };
+
+        function addEventKeyUp(socket) {
+            let action = debounce(function() {
+                let data = {
+                    room: window.location.pathname,
+                    content: document.getElementById('content').innerHTML 
+                };
+                socket.emit('writeFile', data);
+            }, 1000);
+
+            document.getElementById("content").addEventListener('keyup', action);
+        }
+
+        function focusOnLoad() {
+            document.getElementById("content").focus();
+        }
+
+        function listenSocket(socket) {
+            console.log('Listen on: ' + window.location.pathname);
+            socket.on(window.location.pathname, function(data) {
+                document.getElementById("content").innerHTML = data;
+            });
+        }
+
+        window.onload = function() {
+            let socket = io();
+
+            joinRoom(socket);
+            addEventKeyUp(socket);
+            focusOnLoad();
+            listenSocket(socket);
+        }
+    </script>
+</body>
+</html>

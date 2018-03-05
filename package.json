@@ -1,0 +1,21 @@
+{
+  "name": "fast-share",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon -e js,html,ejs,css",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Rafael Marchesini Macario",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^2.5.7",
+    "express": "^4.16.2",
+    "socket.io": "^2.0.4",
+    "winston": "^2.4.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.15.0"
+  }
+}
