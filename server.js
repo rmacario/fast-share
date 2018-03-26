@@ -29,6 +29,11 @@ io.sockets.on('connection', (socket) => {
 });
 
 
+app.get('/god', (req, res) => {
+    res.render('./concretes/god', {
+        usersOnline: new Array()
+    });
+});
 
 app.get('/*', (req, res) => {
     res.render('./concretes/share');

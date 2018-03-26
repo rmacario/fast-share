@@ -1,17 +1,4 @@
-html, body {
-    height: 100%;
-}
-
-body {
-    display: flex;
-}
-
-.content {
-    flex: 1;
-    border: solid 1px black;
-}
-
-.border-none {
-    border: none;
-    outline: none;
+.table-online {
+    height:150px;
+    overflow-y: scroll;
 }
