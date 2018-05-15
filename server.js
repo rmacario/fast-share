@@ -11,7 +11,7 @@ app.use(express.static('views'));
 
 
 io.sockets.on('connection', (socket) => {
-
+    
     socket.on('disconnect', function () {
         socketRooms.leaveRoom(socket);
     });
@@ -31,7 +31,7 @@ io.sockets.on('connection', (socket) => {
 
 app.get('/god', (req, res) => {
     res.render('./concretes/god', {
-        usersOnline: new Array()
+        usersOnline: socketRooms.getUsersOnline()
     });
 });
 

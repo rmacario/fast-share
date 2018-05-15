@@ -2,44 +2,53 @@
 const fs   = require('fs');
 const path = "shared\\";
 
-let nameAsFile = (name) => {
+const _nameAsFile = (name) => {
     name = name + ".txt";
     return name.startsWith('/') ? name.substring(1) : name;
 }
 
-let getPathFile = (fileName) => {
-    return process.cwd() + '\\' + path + nameAsFile(fileName);
+const _getPathFile = (fileName) => {
+    return process.cwd() + '\\' + path + _nameAsFile(fileName);
 }
 
-let fileExists = (fileName) => {
-    return fs.existsSync(getPathFile(fileName));
+const _fileExists = (fileName) => {
+    return fs.existsSync(_getPathFile(fileName));
 };
 
-let createFile = (fileName) => {
+const _createFile = (fileName) => {
     try {
-        fs.closeSync(fs.openSync(getPathFile(fileName), 'w'));
+        fs.closeSync(fs.openSync(_getPathFile(fileName), 'w'));
     } catch(e) {
-        console.log('Erro ao criar arquivo ' + getPathFile(fileName) + ': ' + e);
+        console.log('Erro ao criar arquivo ' + _getPathFile(fileName) + ': ' + e);
         throw 'FileCreateError';
     }
 }
 
+//------------------------------------
+// Exports
 
-
-module.exports.writeFile = (name, content) => {
+module.exports.writeFile = (name, content, shouldAppend) => {
     try {
-        if (!fileExists(name)) {
-            createFile(name);
+        if (!_fileExists(name)) {
+            _createFile(name);
         }
 
-        let stream = fs.createWriteStream(path + nameAsFile(name));
+        if (shouldAppend) {
+            fs.appendFile(path + _nameAsFile(name), content, (error) => {
+                if (error) {
+                    console.log('Erro ao escrever em arquivo: ' + error);
+                }
+            });
 
-        stream.once('open', (fd) => {
-            stream.write(content);
-            stream.end();
-        });
+        } else {
+            let stream = fs.createWriteStream(path + _nameAsFile(name));
 
-        stream.on('error', err => console.log('Erro ao escrever no arquivo ' + nameAsFile(name)));
+            stream.once('open', (fd) => {
+                stream.write(content);
+                stream.end();
+            });
+            stream.on('error', err => console.log('Erro ao escrever no arquivo ' + _nameAsFile(name)));
+        }
 
     } catch(e) {
         console.log('Erro ao escrever conteudo do arquivo: ' + e);
@@ -48,8 +57,24 @@ module.exports.writeFile = (name, content) => {
 
 module.exports.readFile = (name) => {
     let content = "";
-    if (fileExists(name)) {
-        content = fs.readFileSync(getPathFile(name), 'utf8');
+    if (_fileExists(name)) {
+        content = fs.readFileSync(_getPathFile(name), 'utf8');
     }
     return content;
+};
+
+module.exports.makeDirIfNotExists = (dirName, cb) => {
+    fs.mkdir(path + dirName, (error) => {
+        if (error) {
+            if (error.code == 'EEXIST') {
+                cb();
+
+            } else {
+                console.log("Erro ao criar diretório: " + error);
+            }
+            
+        } else {
+            cb();
+        }
+    });
 };

@@ -15,26 +15,24 @@
 </head>
 
 <body>
-    <div>
+    <div class="container">
         <p>Online:</p>
-        <table class="table table-sm table-online">
+        <table class="table table-sm">
             <thead>
-                <th scope="col">IP</th>
-                <th scope="col">Room</th>
-                <th scope="col">Path</th>
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col">Room</th>
+                    <th scope="col">IP</th>
+                    <th scope="col">Socket</th>
+                </tr>
             </thead>
             <tbody>
                 <% for (var i = 0; i < usersOnline.length; i++) { %>
                 <tr>
-                    <td>
-                        <%= i %>
-                    </td>
-                    <td>
-                        <%= i %>
-                    </td>
-                    <td>
-                        <%= i %>
-                    </td>
+                    <th scope="row"><%= i + 1 %></th>
+                    <td><%= usersOnline[i].room %></td>
+                    <td><%= usersOnline[i].ip %></td>
+                    <td><%= usersOnline[i].socket %></td>
                 </tr>
                 <% } %>
             </tbody>

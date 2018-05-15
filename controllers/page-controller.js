@@ -7,5 +7,5 @@ module.exports.getContent = (room) => {
 }
 
 module.exports.write = (path, content) => {
-    fileManager.writeFile('/' + path.substring(1).replace(/\//, "."), content);
+    fileManager.writeFile('/' + path.substring(1).replace(/\//, "."), content, false);
 }

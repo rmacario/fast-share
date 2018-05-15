@@ -1,35 +1,92 @@
 'use strict'
 
-const sockets = new Object();
-const openedRooms = new Object();
+const fileManager = require('../file-content-manager/file-manager');
+const moment      = require('moment');
+
+const sockets     = [];
+const openedRooms = [];
 
 
-const setSocketCurrentRoom = (socket, roomName) => {
-    sockets[socket.id] = roomName;
+const setSocketCurrentRoom = (pSocket, roomName) => {
+    let socket  = {};
+    socket.id   = pSocket.id;
+    socket.room = roomName;
+    socket.ip   = pSocket.handshake.address;
+    sockets.push(socket);
 }
 
 const enterRoom = (socket, roomName) => {
-    if (openedRooms[roomName] == undefined) {
-        openedRooms[roomName] = new Array();
-    } 
-    openedRooms[roomName].push(socket.id);
+    let room = openedRooms.filter(item => item.name == roomName);
+    
+    if (!room || room.length == 0) {
+        room = {};
+        room.name = roomName;
+        room.members = [];
+        room.members.push(socket.id);
+
+        openedRooms.push(room);
+
+    } else {
+        room[0].members.push(socket.id);
+    }
 }
 
-const leaveRoom = (room, socketId) => {
-    room.splice(room.indexOf(socketId), 1);
+const leaveRoom = (room, socket) => {
+    let roomIndex = room[0].members.indexOf(socket[0].id);
+    room[0].members.splice(roomIndex, 1);
+    delete socket.rooms;
 }
 
+const _getCurrentTime = () => {
+    return moment(new Date()).format("DD/MM/YYYY HH:mm");
+}
 
+const saveHistory = (room, socket) => {
+    let directory = 'history';
+    let history = `[${_getCurrentTime()}] - ${socket.handshake.address} acessou ${room}.\r\n`;
+    
+    fileManager.makeDirIfNotExists(directory, function() {
+        fileManager.writeFile(directory + '/history', history, true)
+    });
+}
+
+// ----------------------------------------------------
+// Exports
 
 module.exports.joinRoom = (socket, roomName) => {
     setSocketCurrentRoom(socket, roomName);
     enterRoom(socket, roomName);
+    saveHistory(roomName, socket);
 }
 
-module.exports.leaveRoom = (socket) => {
-    let roomName = sockets[socket.id];
-    if (openedRooms[roomName] != undefined) {
-        leaveRoom(openedRooms[roomName], socket.id);
-        sockets[socket.id] = undefined;
+module.exports.leaveRoom = (pSocket) => {
+    let socket = sockets.filter(socketItem => pSocket.id == socketItem.id);
+    
+    if (socket && socket.length > 0) {
+        let room = openedRooms.filter(roomItem => socket[0].room == roomItem.name);
+        leaveRoom(room, socket);
     }
+}
+
+module.exports.getUsersOnline = () => {
+    let usersOnline = [];
+    
+    for (let i = 0; i < openedRooms.length; i++) {
+        if (openedRooms[i].members && openedRooms[i].members.length > 0) {
+
+            for (let j = 0; j < openedRooms[i].members.length; j++) {
+                let usr = {};
+                usr.room   = openedRooms[i].name;
+
+                let socket = sockets.filter(socket => socket.id == openedRooms[i].members[j]);
+                if (socket && socket.length > 0) {
+                    usr.socket = socket[0].id;
+                    usr.ip     = socket[0].ip;
+                }
+                usersOnline.push(usr);
+            }
+        }
+    }
+
+    return usersOnline;
 }
