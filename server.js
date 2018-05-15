@@ -31,7 +31,8 @@ io.sockets.on('connection', (socket) => {
 
 app.get('/god', (req, res) => {
     res.render('./concretes/god', {
-        usersOnline: socketRooms.getUsersOnline()
+        usersOnline: socketRooms.getUsersOnline(),
+        history: pageControler.readHistory(0, 20)
     });
 });
 

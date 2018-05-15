@@ -1,6 +1,8 @@
 'use strict'
-const fs   = require('fs');
-const path = "shared\\";
+
+const fs        = require('fs');
+const path      = "shared\\";
+const constants =  require('../constants/constants');
 
 const _nameAsFile = (name) => {
     name = name + ".txt";
@@ -62,6 +64,43 @@ module.exports.readFile = (name) => {
     }
     return content;
 };
+
+module.exports.readFileAsync = async (fileName, startLine, endLine, order) => {
+    let minBytePerLine = 45;
+    let startByte = startLine * minBytePerLine;
+    let endByte   = minBytePerLine * endLine;
+
+    if (_fileExists(fileName)) {
+        let readStream = fs.createReadStream(_getPathFile(fileName), {
+            start: startByte,
+            end: endByte
+        });
+
+        let p = new Promise((resolve, reject) => {
+            let content = [];
+
+            readStream.on('data', chunk => {
+                let lines = chunk.toString().split(constants.END_LINE);
+                if (!lines[lines.length - 1].toString().endsWith(constants.END_LINE)) {
+                    lines.splice(-1, 1);
+                }
+                content.push(chunk);
+            });
+
+            readStream.on('end', chunk => {
+                resolve(content);
+            });
+    
+            readStream.on('error', err => {
+                console.log('Erro ao ler arquivo de historico: ' + err);
+                reject(err);
+            });
+        });
+
+        let content = await p;
+        return content;
+    }
+}
 
 module.exports.makeDirIfNotExists = (dirName, cb) => {
     fs.mkdir(path + dirName, (error) => {

@@ -16,27 +16,60 @@
 
 <body>
     <div class="container">
-        <p>Online:</p>
-        <table class="table table-sm">
-            <thead>
-                <tr>
-                    <th scope="col"></th>
-                    <th scope="col">Room</th>
-                    <th scope="col">IP</th>
-                    <th scope="col">Socket</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% for (var i = 0; i < usersOnline.length; i++) { %>
-                <tr>
-                    <th scope="row"><%= i + 1 %></th>
-                    <td><%= usersOnline[i].room %></td>
-                    <td><%= usersOnline[i].ip %></td>
-                    <td><%= usersOnline[i].socket %></td>
-                </tr>
-                <% } %>
-            </tbody>
-        </table>
+
+        <!-- INICIO USUARIOS ONLINE -->
+        <section id="online">
+            <div style="min-height: 400px">
+                <p>Online:</p>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th scope="col"></th>
+                            <th scope="col">Room</th>
+                            <th scope="col">IP</th>
+                            <th scope="col">Socket</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% for (var i = 0; i < usersOnline.length; i++) { %>
+                        <tr>
+                            <th scope="row"><%= i + 1 %></th>
+                            <td><%= usersOnline[i].room %></td>
+                            <td><%= usersOnline[i].ip %></td>
+                            <td><%= usersOnline[i].socket %></td>
+                        </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+       </section>
+        <!-- FIM USUARIOS ONLINE -->
+
+
+        <!-- INICIO HISTORICO -->
+        <section id="history">
+            <div>
+                <p>History:</p>
+
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th scope="col"></th>
+                            <th scope="col">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% for (var i = 0; i < history.length; i++) { %>
+                        <tr>
+                            <th scope="row"><%= i + 1 %></th>
+                            <td><%= history[i] %></td>
+                        </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <!-- FIM HISTORICO -->
     </div>
 
 </body>
