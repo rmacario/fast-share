@@ -4,6 +4,7 @@ let app            = express();
 let http           = require('http').Server(app);
 let io             = require('socket.io')(http);
 let socketRooms    = require('./sockets/socket-rooms');
+let constants      = require('./constants/constants');
 
 
 app.set('view engine', 'ejs');
@@ -30,9 +31,21 @@ io.sockets.on('connection', (socket) => {
 
 
 app.get('/god', (req, res) => {
-    res.render('./concretes/god', {
-        usersOnline: socketRooms.getUsersOnline(),
-        history: pageControler.readHistory(0, 20)
+
+    let usersOnline    = socketRooms.getUsersOnline();
+    let historyPromise = pageControler.readHistory();
+
+    Promise.all([historyPromise]).then((resolve) => {
+        res.render('./concretes/god', {
+            usersOnline: usersOnline,
+            history: resolve[0]
+        });
+
+    }).catch(err => {
+        res.render('./concretes/god', {
+            usersOnline: usersOnline,
+            history: []
+        });
     });
 });
 

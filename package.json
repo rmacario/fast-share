@@ -12,6 +12,7 @@
   "dependencies": {
     "ejs": "^2.5.7",
     "express": "^4.16.2",
+    "line-reader": "^0.4.0",
     "moment": "^2.22.0",
     "socket.io": "^2.0.4",
     "winston": "^2.4.0"

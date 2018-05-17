@@ -1,8 +1,9 @@
 'use strict'
 
-const fs        = require('fs');
-const path      = "shared\\";
-const constants =  require('../constants/constants');
+const fs         = require('fs');
+const lineReader = require('line-reader');
+const constants  =  require('../constants/constants');
+
 
 const _nameAsFile = (name) => {
     name = name + ".txt";
@@ -10,7 +11,7 @@ const _nameAsFile = (name) => {
 }
 
 const _getPathFile = (fileName) => {
-    return process.cwd() + '\\' + path + _nameAsFile(fileName);
+    return process.cwd() + '\\' + constants.SHARED_PATH + '\\' + _nameAsFile(fileName);
 }
 
 const _fileExists = (fileName) => {
@@ -36,14 +37,14 @@ module.exports.writeFile = (name, content, shouldAppend) => {
         }
 
         if (shouldAppend) {
-            fs.appendFile(path + _nameAsFile(name), content, (error) => {
+            fs.appendFile(_getPathFile(name), content, (error) => {
                 if (error) {
                     console.log('Erro ao escrever em arquivo: ' + error);
                 }
             });
 
         } else {
-            let stream = fs.createWriteStream(path + _nameAsFile(name));
+            let stream = fs.createWriteStream(_getPathFile(name));
 
             stream.once('open', (fd) => {
                 stream.write(content);
@@ -65,45 +66,35 @@ module.exports.readFile = (name) => {
     return content;
 };
 
-module.exports.readFileAsync = async (fileName, startLine, endLine, order) => {
-    let minBytePerLine = 45;
-    let startByte = startLine * minBytePerLine;
-    let endByte   = minBytePerLine * endLine;
+module.exports.readFileAsync = (fileName, startLine, endLine) => {
+    let content = [];
+    let countLine = 0;
 
     if (_fileExists(fileName)) {
-        let readStream = fs.createReadStream(_getPathFile(fileName), {
-            start: startByte,
-            end: endByte
-        });
 
-        let p = new Promise((resolve, reject) => {
-            let content = [];
+        return new Promise((resolve, reject) => {
+            lineReader.eachLine(_getPathFile(fileName), (line, last) => {
+                if (countLine < endLine) {
+                    content.push(line);
+                    countLine++;
 
-            readStream.on('data', chunk => {
-                let lines = chunk.toString().split(constants.END_LINE);
-                if (!lines[lines.length - 1].toString().endsWith(constants.END_LINE)) {
-                    lines.splice(-1, 1);
+                } else {
+                    resolve(content);
+                    return false;
                 }
-                content.push(chunk);
-            });
 
-            readStream.on('end', chunk => {
-                resolve(content);
-            });
-    
-            readStream.on('error', err => {
-                console.log('Erro ao ler arquivo de historico: ' + err);
-                reject(err);
+                if (last) {
+                    resolve(content);
+                }
             });
         });
-
-        let content = await p;
+    } else {
         return content;
     }
 }
 
 module.exports.makeDirIfNotExists = (dirName, cb) => {
-    fs.mkdir(path + dirName, (error) => {
+    fs.mkdir(constants.SHARED_PATH + dirName, (error) => {
         if (error) {
             if (error.code == 'EEXIST') {
                 cb();
@@ -117,3 +108,14 @@ module.exports.makeDirIfNotExists = (dirName, cb) => {
         }
     });
 };
+
+module.exports.getFileSize = (fileName) => {
+    return new Promise((resolve, reject) => {
+        fs.stat(_getPathFile(fileName), (err, stat) => {
+            if (!err)
+                resolve(stat.size);
+            else 
+                reject();
+        });
+    });
+}
