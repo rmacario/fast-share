@@ -13,8 +13,8 @@
 
 
 <body>
-    <div id="content" contenteditable="true" class="border-none content" tabindex="0">
-    </div>
+    
+    <%- include(page) %>
 
     <script>
         function joinRoom(socket) {
@@ -45,7 +45,7 @@
             let action = debounce(function () {
                 let data = {
                     room: window.location.pathname,
-                    content: document.getElementById('content').innerHTML
+                    content: _getContent()
                 };
                 socket.emit('writeFile', data);
             }, 1000);

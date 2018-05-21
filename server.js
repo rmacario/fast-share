@@ -49,8 +49,16 @@ app.get('/god', (req, res) => {
     });
 });
 
+app.get('*/txt', (req, res) => {
+    res.render('./concretes/share-template', {
+        page: './share-text'
+    });
+});
+
 app.get('/*', (req, res) => {
-    res.render('./concretes/share');
+    res.render('./concretes/share-template', {
+        page: './share-default'
+    });
 });
 
 
