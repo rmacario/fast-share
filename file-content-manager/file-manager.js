@@ -11,7 +11,7 @@ const _nameAsFile = (name) => {
 }
 
 const _getPathFile = (fileName) => {
-    return process.cwd() + '\\' + constants.SHARED_PATH + '\\' + _nameAsFile(fileName);
+    return process.cwd() + '/' + constants.SHARED_PATH + '/' + _nameAsFile(fileName);
 }
 
 const _fileExists = (fileName) => {
@@ -94,7 +94,9 @@ module.exports.readFileAsync = (fileName, startLine, endLine) => {
 }
 
 module.exports.makeDirIfNotExists = (dirName, cb) => {
-    fs.mkdir(constants.SHARED_PATH + dirName, (error) => {
+    let dirPath = constants.SHARED_PATH + '/' + dirName;
+
+    fs.mkdir(dirPath, (error) => {
         if (error) {
             if (error.code == 'EEXIST') {
                 cb();

@@ -1,6 +1,7 @@
 'use strict'
 
 const fileManager = require('../file-content-manager/file-manager');
+const constants   = require('../constants/constants');   
 const moment      = require('moment');
 
 const sockets     = [];
@@ -42,11 +43,10 @@ const _getCurrentTime = () => {
 }
 
 const saveHistory = (room, socket) => {
-    let directory = 'history';
     let history = `[${_getCurrentTime()}] - ${socket.handshake.address} acessou ${room}.\r\n`;
     
-    fileManager.makeDirIfNotExists(directory, function() {
-        fileManager.writeFile(directory + '/history', history, true)
+    fileManager.makeDirIfNotExists(constants.HISTORY_FOLDER_PATH, function() {
+        fileManager.writeFile(constants.HISTORY_FILE_PATH, history, true)
     });
 }
 
