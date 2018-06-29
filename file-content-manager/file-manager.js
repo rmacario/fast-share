@@ -1,8 +1,9 @@
 'use strict'
 
-const fs         = require('fs');
-const lineReader = require('line-reader');
-const constants  =  require('../constants/constants');
+const fs          = require('fs');
+const lineReader  = require('line-reader');
+const prependFile = require('prepend-file');
+const constants   =  require('../constants/constants');
 
 
 const _nameAsFile = (name) => {
@@ -30,18 +31,27 @@ const _createFile = (fileName) => {
 //------------------------------------
 // Exports
 
-module.exports.writeFile = (name, content, shouldAppend) => {
+module.exports.writeFile = (name, content, shouldAppend, writeAtStart) => {
     try {
         if (!_fileExists(name)) {
             _createFile(name);
         }
 
         if (shouldAppend) {
-            fs.appendFile(_getPathFile(name), content, (error) => {
-                if (error) {
-                    console.log('Erro ao escrever em arquivo: ' + error);
-                }
-            });
+            if (writeAtStart) {
+                prependFile(_getPathFile(name), content, (error) => {
+                    if (error) {
+                        console.log('Erro ao escrever em arquivo (prepend): ' + error);
+                    }
+                });
+
+            } else {
+                fs.appendFile(_getPathFile(name), content, (error) => {
+                    if (error) {
+                        console.log('Erro ao escrever em arquivo: ' + error);
+                    }
+                });
+            }
 
         } else {
             let stream = fs.createWriteStream(_getPathFile(name));

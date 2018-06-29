@@ -18,12 +18,5 @@ module.exports.readHistory = async () => {
     let content = (fileSize == 0 ? [] :
             await fileManager.readFileAsync(constants.HISTORY_FILE_PATH, 0, constants.MAX_LINES_HIST));
 
-    if (content && content.length > 0) {
-        content = content.reverse();
-
-    } else {
-        content = [];
-    }
-
     return content;
 }

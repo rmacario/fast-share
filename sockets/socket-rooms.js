@@ -46,7 +46,7 @@ const saveHistory = (room, socket) => {
     let history = `[${_getCurrentTime()}] - ${socket.handshake.address} acessou ${room}.\r\n`;
     
     fileManager.makeDirIfNotExists(constants.HISTORY_FOLDER_PATH, function() {
-        fileManager.writeFile(constants.HISTORY_FILE_PATH, history, true)
+        fileManager.writeFile(constants.HISTORY_FILE_PATH, history, true, true)
     });
 }
 
